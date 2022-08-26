@@ -1,4 +1,4 @@
-var throttle = require('lodash.throttle');
+import throttle from 'lodash.throttle';
 
 const formEl = document.querySelector('.feedback-form');
 formEl.addEventListener('input', throttle(saveData, 500));
@@ -15,16 +15,15 @@ updateSavedData();
 function saveData(e) {
   formData[e.target.name] = e.target.value;
   localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(formData));
-  updateSavedData();
 }
 
-function updateSavedData(e) {
-  const data = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
-  // console.log(data);
-  for (const elem in data) {
-    if (data.hasOwnProperty(elem)) {
-      inputEl.value = data.email  || '';
-      textareaEl.value = data.message  || '';
+function updateSavedData() {
+  formData = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY)) || {};
+
+  for (const elem in formData) {
+    if (formData.hasOwnProperty(elem)) {
+      inputEl.value = formData.email || '';
+      textareaEl.value = formData.message || '';
     }
   }
 }
@@ -32,11 +31,14 @@ function updateSavedData(e) {
 function submitForm(e) {
   e.preventDefault();
 
-  formData = {
-    email: inputEl.value,
-    message: textareaEl.value,
-  };
-  console.log(formData);
-  localStorage.clear();
-  formEl.reset();
+  if (inputEl.value !== '' && textareaEl.value !== '') {
+    console.log(formData);
+    e.currentTarget.reset();
+    localStorage.removeItem(LOCALSTORAGE_KEY);
+
+  }
+    for (const elem in formData) {
+    delete formData[elem];
+  }
 }
+
